@@ -42,18 +42,23 @@ rl.question('Введите первое число, от: ', (num1) => {
 			console.log(colors.red('Простых чисел в данном диапозоне нет'))
 			rl.close();
 		} else {
-			arr.forEach((element, i) => {
-				if (i === 0) {
-					console.log(colors.green(element))
-				}
-				else if (i === 1) {
-					console.log(colors.yellow(element))
-				}
-				else if (i === 2) {
-					console.log(colors.red(element))
-				}
-				else console.log(colors.grey(element))
-			})
+			console.log(`Вывожу простые числа в диапозоне с ${num1} по ${num2}`);
+			console.log(colors.green(arr[0]),
+			 colors.yellow(arr[1]),
+			 colors.red(arr[2]),
+			  arr.splice(3,arr.length-1).join(' '));
+			// arr.forEach((element, i) => {
+			// 	if (i === 0) {
+			// 		console.log(colors.green(element))
+			// 	}
+			// 	else if (i === 1) {
+			// 		console.log(colors.yellow(element))
+			// 	}
+			// 	else if (i === 2) {
+			// 		console.log(colors.red(element))
+			// 	}
+			// 	else console.log(colors.grey(element))
+			// })
 		}
 		rl.close();
 	});
