@@ -1,67 +1,48 @@
-import colors from 'colors';
-import readline from 'readline';
 
-function isPrimeNumber(a, b) {
-	let result = [];
-	nextPrime:
-	for (let i = a; i <= b; i++) { // Для всех i...
-		for (let j = 2; j < i; j++) { // проверить, делится ли число..
-			if (i % j == 0) continue nextPrime; // не подходит, берём следующее
-		}
-		result.push(+i);
+import moment from 'moment'
+import 'moment-timezone';
+import EventEmmiter from 'events'
+import 'moment-precise-range-plugin'
+
+const emmiter = new EventEmmiter()
+
+const [ dateStringInFuture] =process.argv.slice(2)
+const DATE_FORMAT_PATTERN = 'YYYY-MM-DD HH:mm:ss';
+
+const getDateFromDateString = (dateString) => {
+	const [hour, day, month, year] = dateString.split('-');
+	return new Date(year,month - 1, day, hour);
+};
+
+
+const showRemainingTime = (dateInFuture) => {
+	const dateNow = new Date ();
+	if (dateNow >= dateInFuture) {
+		emmiter.emit('timerEnd');
 	}
-	return result;
+	 else {
+		const currentDateFormatted = moment(dateNow, DATE_FORMAT_PATTERN);
 
+		const futureDateFormatted = moment(dateInFuture, DATE_FORMAT_PATTERN);
+		const diff = moment.preciseDiff(currentDateFormatted, futureDateFormatted);
+
+		console.clear();
+		console.log(diff);
+	 }
+};
+
+const showTimeDone = (timerId) => {
+	clearInterval(timerId);
+	console.log('Таймер истёк');
 }
 
-console.log('Введите диапазон простых чисел от и до');
+const dateInFuture = getDateFromDateString(dateStringInFuture);
 
+const timerId = setInterval(() => {
+	emmiter.emit('timerTick', dateInFuture);
+}, 1000)
 
-
-const rl = readline.createInterface({
-	input: process.stdin,
-	output: process.stdout
+emmiter.on('timerTick', showRemainingTime);
+emmiter.on('timerEnd', () => {
+	showTimeDone(timerId);
 });
-
-
-rl.question('Введите первое число, от: ', (num1) => {
-	rl.question('Введите второе число, до : ', (num2) => {
-
-		if (Math.sign(num1) < 0 || Math.sign(num2) < 0  ) {
-			console.log('Ведите положительное число');
-			rl.close();
-		}
-		if (!Number.isInteger(+num1) || !Number.isInteger(+num2)) {
-			console.warn(colors.red('Введенные данные не являются числами'));
-			rl.close();
-		}
-
-		let arr = isPrimeNumber(+num1, +num2);
-
-		if (arr.length === 0) {
-			console.log(colors.red('Простых чисел в данном диапозоне нет'))
-			rl.close();
-		} else {
-			console.log(`Вывожу простые числа в диапозоне с ${num1} по ${num2}`);
-			console.log(colors.green(arr[0]),
-			 colors.yellow(arr[1]),
-			 colors.red(arr[2]),
-			  arr.splice(3,arr.length-1).join(' '));
-			// arr.forEach((element, i) => {
-			// 	if (i === 0) {
-			// 		console.log(colors.green(element))
-			// 	}
-			// 	else if (i === 1) {
-			// 		console.log(colors.yellow(element))
-			// 	}
-			// 	else if (i === 2) {
-			// 		console.log(colors.red(element))
-			// 	}
-			// 	else console.log(colors.grey(element))
-			// })
-		}
-		rl.close();
-	});
-});
-
-
