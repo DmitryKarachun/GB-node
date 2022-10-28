@@ -1,48 +1,26 @@
+const fs = require('fs')
+const readline = require('readline')
 
-import moment from 'moment'
-import 'moment-timezone';
-import EventEmmiter from 'events'
-import 'moment-precise-range-plugin'
+const ACCESS_LOG ='./access.log'
+const readStream = fs.createReadStream(ACCESS_LOG, 'utf8');
+const writeStream1 = fs.createWriteStream('./89.123.1.41_request.log')
+const writeStream2 = fs.createWriteStream('./34.48.240.111_request.log')
 
-const emmiter = new EventEmmiter()
+let numStr = 0;
 
-const [ dateStringInFuture] =process.argv.slice(2)
-const DATE_FORMAT_PATTERN = 'YYYY-MM-DD HH:mm:ss';
-
-const getDateFromDateString = (dateString) => {
-	const [hour, day, month, year] = dateString.split('-');
-	return new Date(year,month - 1, day, hour);
-};
+const rl = readline.createInterface({
+	input: readStream,
+	terminal:true
+})
 
 
-const showRemainingTime = (dateInFuture) => {
-	const dateNow = new Date ();
-	if (dateNow >= dateInFuture) {
-		emmiter.emit('timerEnd');
+rl.on('line', (line) => {
+	if (line.includes("89.123.1.41")) {
+		writeStream1.write(line + "\n")
 	}
-	 else {
-		const currentDateFormatted = moment(dateNow, DATE_FORMAT_PATTERN);
 
-		const futureDateFormatted = moment(dateInFuture, DATE_FORMAT_PATTERN);
-		const diff = moment.preciseDiff(currentDateFormatted, futureDateFormatted);
-
-		console.clear();
-		console.log(diff);
-	 }
-};
-
-const showTimeDone = (timerId) => {
-	clearInterval(timerId);
-	console.log('Таймер истёк');
-}
-
-const dateInFuture = getDateFromDateString(dateStringInFuture);
-
-const timerId = setInterval(() => {
-	emmiter.emit('timerTick', dateInFuture);
-}, 1000)
-
-emmiter.on('timerTick', showRemainingTime);
-emmiter.on('timerEnd', () => {
-	showTimeDone(timerId);
-});
+	if (line.includes("34.48.240.111")) {
+		writeStream2.write(line + "\n")
+	}
+	console.log(++numStr);
+})
