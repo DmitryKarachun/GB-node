@@ -13,16 +13,24 @@ function isPrimeNumber(a, b) {
 	return result;
 
 }
-
 console.log('Введите диапазон простых чисел от и до');
-
-
-
 const rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout
 });
 
+let idColor = 0;
+
+function colorsPrint (arr) {
+	const colorsType = ['green', 'yellow', 'red'];
+	console.log( colors[colorsType[idColor]](arr));
+
+	if (idColor === colorsType.length - 1) {
+		idColor = 0;
+	} else {
+		idColor++;
+	}
+}
 
 rl.question('Введите первое число, от: ', (num1) => {
 	rl.question('Введите второе число, до : ', (num2) => {
@@ -30,10 +38,12 @@ rl.question('Введите первое число, от: ', (num1) => {
 		if (Math.sign(num1) < 0 || Math.sign(num2) < 0  ) {
 			console.log('Ведите положительное число');
 			rl.close();
+			return false;
 		}
 		if (!Number.isInteger(+num1) || !Number.isInteger(+num2)) {
 			console.warn(colors.red('Введенные данные не являются числами'));
 			rl.close();
+			return false;
 		}
 
 		let arr = isPrimeNumber(+num1, +num2);
@@ -43,22 +53,11 @@ rl.question('Введите первое число, от: ', (num1) => {
 			rl.close();
 		} else {
 			console.log(`Вывожу простые числа в диапозоне с ${num1} по ${num2}`);
-			console.log(colors.green(arr[0]),
-			 colors.yellow(arr[1]),
-			 colors.red(arr[2]),
-			  arr.splice(3,arr.length-1).join(' '));
-			// arr.forEach((element, i) => {
-			// 	if (i === 0) {
-			// 		console.log(colors.green(element))
-			// 	}
-			// 	else if (i === 1) {
-			// 		console.log(colors.yellow(element))
-			// 	}
-			// 	else if (i === 2) {
-			// 		console.log(colors.red(element))
-			// 	}
-			// 	else console.log(colors.grey(element))
-			// })
+			for (let index = 0; index < arr.length; index++) {
+				colorsPrint(arr[index]);
+				// console.log(arr[index]);
+				
+			}
 		}
 		rl.close();
 	});
